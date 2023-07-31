@@ -13,6 +13,7 @@ import path from "path"
 import { fileURLToPath } from "url"
 
 import authRoutes from './routes/auth.js'
+import userRoutes from './routes/users.js'
 import {register} from "./controllers/auth.js"
 
 
@@ -55,6 +56,7 @@ app.post("/auth/register", upload.single("picture"), register)
 
 /* ALL OTHER ROUTES */
 app.use("/auth", authRoutes)
+app.use("/users", userRoutes)
 
 //router: post type, url to be fetched to initialise this middleware.
         //to handle images and upload them, using upload.single("picture")
