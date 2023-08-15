@@ -22,6 +22,11 @@ import {createPost} from "./controllers/posts.js"
 import { verifyToken } from "./middleware/auth.js"
 
 
+/* Importing data files, for random data for users and posts*/
+import { users, posts } from "./data/index.js" //data
+import User from "./models/User.js" //dataBase clusters
+import Post from "./models/Post.js" //dataBase clusters
+
 /* CONFIGURATIONS:: especially for using the import module format */
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -57,13 +62,22 @@ const storage = multer.diskStorage({
 })
 const upload = multer({storage})
 /* ROUTES WITH FILES LIKE IMAGES AND POSTS */
+// The routes needing the image upload has to been via this file only, as multer has
+// been initialised here only, upload.single("picture") makes sure the
+// uploaded image has been added in the local storage/ Backend
 app.post("/auth/register", upload.single("picture"), register)
 app.post("/posts", verifyToken, upload.single("picture"), createPost)
 
 /* ALL OTHER ROUTES */
+// The routes that handle authentication and authorization of user: login, signup, verifying and generating token
 app.use("/auth", authRoutes)
+// The routes that handle all user related queries: add/Remove friend, get user friend, get user specific details
 app.use("/users", userRoutes)
+// The routes that handle all post realted queries: showing my post, all posts, liked posts
 app.use("/posts", postRoutes)
+//These are basically other file extensions, the second paramter are just another locaiton
+//which are called when someone enters these base routes. 
+//later those routes in these files, are called upon triggering those specific urls
 
 //router: post type, url to be fetched to initialise this middleware.
         //to handle images and upload them, using upload.single("picture")
@@ -78,6 +92,31 @@ mongoose.connect(process.env.MONGO_URI,{
     useUnifiedTopology: true,
 }).then(() => {
     app.listen(PORT, ()=> console.log(`Server Port : ${PORT}`));
+
+    /* ADD ONE TIME ONLY, When you delete your db, run below only once, to create dummy data */
+    // User.insertMany(users);
+    // Post.insertMany(posts)
 })
 .catch((error) => console.log(`${error} did not connect`));
 
+/*
+Links:
+Material UI: https://mui.com/material-ui/getting-started/installation/
+Redux Toolkit: https://redux-toolkit.js.org/introduction/getting-started 
+React Router: https://reactrouter.com/en/v6.3.0/getting-started/installation
+Redux Persist: https://github.com/rt2zz/redux-persist
+React Dropzone: https://react-dropzone.js.org/
+Node: https://nodejs.org/en/download/
+Nodemon: https://github.com/remy/nodemon
+NPX: https://www.npmjs.com/package/npx
+VsCode: https://code.visualstudio.com/download
+Dotenv: https://github.com/motdotla/dotenv
+MongoDB: https://www.mongodb.com/
+Mongoose: https://github.com/Automattic/mongoose
+JsonWebToken: https://github.com/auth0/node-jsonwebtoken 
+Multer: https://github.com/expressjs/multer
+GridFS-Storage: https://github.com/devconcept/multer-gridfs-storage
+Google Fonts: https://fonts.google.com/
+Formik: https://formik.org/docs/overview
+Yup: https://github.com/jquense/yup
+*/

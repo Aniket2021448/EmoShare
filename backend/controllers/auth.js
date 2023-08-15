@@ -1,9 +1,9 @@
 
-import bcrypt from 'bcrypt'
-import jwt from "jsonwebtoken"
-import User from "../models/User.js"
+import bcrypt from 'bcrypt' //for user verification generates salt
+import jwt from "jsonwebtoken" //for user verification
+import User from "../models/User.js" //to user user database, for finding and updating
 
-
+// SIGNUP/ REGISTER :: TAKE USER'S DETAILS SEGREGATE THEM, THEN ADD THEM IN THE DATABASE
 export const register = async(req, res) => {
   try{
     const{
@@ -48,22 +48,25 @@ export const register = async(req, res) => {
 }
 
 
-/* LOGIN */
+/* LOGIN :: check for entered email and password use bcrypt to compare entered with
+salted password and verify email, is this all is satisfied, return a json web token
+to keep track whether user logged in or logged out.*/
 
 export const login = async(req, res)=>{
     try{
+        //segregating details of the form submitted, then find it in DB
         const {email, password} = req.body
         const user = await User.findOne({email: email})
 
         if(!user){
             return res.status(400).json({msg: "User does not exist."})
         }
-
+        //verify salted password for the entered email address
         const isMatch = await bcrypt.compare(password, user.password)
         if(!isMatch){
             return res.status(400).json({msg: "Invalid credentials"})
         }
-
+        //if verification done, return json web token and user details.
         const token = jwt.sign({id: user._id}, process.env.JWT_SECRET)
         delete user.password
         res.status(200).json({token, user})
